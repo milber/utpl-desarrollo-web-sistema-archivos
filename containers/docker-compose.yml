@@ -1,0 +1,49 @@
+version: '3.8'
+
+services:
+  web:
+    image: php:8.3-apache
+    container_name: web_php_arm
+    ports:
+      - "8080:80"
+    volumes:
+      - ../:/var/www/html
+    # Esta es la instrucción para instalar al arrancar
+    command: >
+      sh -c "docker-php-ext-install mysqli &&
+             docker-php-ext-enable mysqli &&
+             apache2-foreground"
+    restart: always
+
+#   # 2. MariaDB Database (uses official image with ARM support)
+  # db:
+  #   image: mariadb:latest
+  #   container_name: db_mariadb_arm
+  #   environment:
+  #     # IMPORTANT: Change these values to secure credentials
+  #     MYSQL_ROOT_PASSWORD: ${DB_ROOT_PASS}
+  #     MYSQL_DATABASE: ${DB_NAME}
+  #     MYSQL_USER: ${DB_USER}
+  #     MYSQL_PASSWORD: ${DB_PASS}
+  #   volumes:
+  #     # This volume ensures your data persists even if the container is removed
+  #     - db_data:/var/lib/mysql
+  #   ports:
+  #     - "3307:3306"
+  #   restart: always
+
+#   # 3. phpMyAdmin (uses official image with ARM support)
+#   phpmyadmin:
+#     image: phpmyadmin/phpmyadmin
+#     container_name: phpmyadmin_arm
+#     environment:
+#       # Connects phpMyAdmin to the 'db' service (using its name)
+#       PMA_HOST: db
+#       MYSQL_ROOT_PASSWORD: ${DB_ROOT_PASS}
+#     ports:
+#       - "8081:80"
+#     restart: always
+
+# Define the persistent volume for MariaDB data
+volumes:
+  db_data:
