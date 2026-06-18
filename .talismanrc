@@ -1,0 +1,4 @@
+fileignoreconfig:
+- filename: design/create_db_schema.sql
+  checksum: fee16cc3b551f0a512b09b9af65085bffcb06ff6f36ac792f4e382d2560b573d
+version: "1.0"
