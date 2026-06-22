@@ -31,7 +31,6 @@
                 $mensaje = "<strong>Error:</strong> Ocurrió un problema con la base de datos. Intenta de nuevo.";
                 break;
             case 'upload_error':
-                session_start();
                 $mensaje = "<strong>Error de Carga:</strong> " . ($_SESSION['upload_err_msg'] ?? "No se pudo procesar el archivo.");
                 unset($_SESSION['upload_err_msg']);
                 break;
