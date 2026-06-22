@@ -17,14 +17,18 @@ class FileUploader {
     /**
      * Constructor de la clase Uploader
      */
-    public function __construct($databaseConnection, $uploadDirectory = 'uploads/') {
+    public function __construct($databaseConnection, $uploadDirectory = 'uploads') {
         $this->db = $databaseConnection;
 
-        // Normalizamos la ruta para asegurar que termine con una barra limpia '/'
-        $this->uploadDir = rtrim($uploadDirectory, '/') . '/';
+        // Limpiamos barras iniciales o finales que se pasen por parámetro
+        $cleanPath = trim($uploadDirectory, '/\\');
+
+        // agregando el archivo a: /var/www/html/uploads/
+        $this->uploadDir = $_SERVER['DOCUMENT_ROOT'] . '/' . $cleanPath . '/';
         
-        // Verificamos si la carpeta existe en el entorno; si no, la creamos con permisos seguros
+        // Verificamos si la carpeta existe en la raíz del servidor; si no, la creamos
         if (!file_exists($this->uploadDir)) {
+            // El tercer parámetro 'true' permite la creación de directorios recursivos seguros
             mkdir($this->uploadDir, 0755, true);
         }
     }
@@ -65,8 +69,8 @@ class FileUploader {
         $cleanExtension = substr($fileExtension, 0, 3);
         $file->setTipo($cleanExtension);
         
-        // Criptografía: Generar un nombre hash único para evitar colisiones de archivos en el disco
-        $uniqueName = bin2hex(random_bytes(16)) . '.' . $fileExtension;
+        // Generar un nombre hash único para evitar colisiones de archivos en el disco
+        $uniqueName = bin2hex(random_bytes(16)).'-'.$file->getNombreOriginal();
         $file->setNombreArchivo($uniqueName);
         $file->setCarpeta($this->uploadDir);
 
