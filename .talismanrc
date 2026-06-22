@@ -1,4 +1,6 @@
 fileignoreconfig:
+- filename: connection_db.php
+  checksum: 6f767ff83a27671a4ebe8de1ca440c2372309e432731388b1ca6132096c29691
 - filename: design/create_db_schema.sql
-  checksum: fee16cc3b551f0a512b09b9af65085bffcb06ff6f36ac792f4e382d2560b573d
+  checksum: 36d9800ef2e399fc670eb7a5dce1b64b843732caa6a73acd2259dc1c78836ba2
 version: "1.0"

@@ -42,7 +42,7 @@ CREATE TABLE IF NOT EXISTS `macb_archivos`.`archivos` (
   `tipo` VARCHAR(3) NOT NULL,
   `tamanio` INT NOT NULL,
   `carpeta` VARCHAR(45) NOT NULL,
-  `fecha_subida` VARCHAR(45) NOT NULL DEFAULT 'CURRENT_TIMESTAMP',
+  `fecha_subida` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `usuarios_id_usuario` INT NOT NULL,
   PRIMARY KEY (`id`),
   INDEX `fk_archivos_usuarios_idx` (`usuarios_id_usuario` ASC) VISIBLE,
@@ -58,14 +58,17 @@ SET SQL_MODE=@OLD_SQL_MODE;
 SET FOREIGN_KEY_CHECKS=@OLD_FOREIGN_KEY_CHECKS;
 SET UNIQUE_CHECKS=@OLD_UNIQUE_CHECKS;
 
--- User for app
-CREATE USER IF NOT EXISTS 'macb_archivos'@'localhost'
+
+-- -----------------------------------------------------
+-- Creación de Usuario de Aplicación
+-- -----------------------------------------------------
+CREATE USER IF NOT EXISTS 'macb_archivos'@'%'
 IDENTIFIED BY 'MacbArchivos2026!';
 
 -- Permisos sobre la base
 GRANT ALL PRIVILEGES
 ON macb_archivos.*
-TO 'macb_archivos'@'localhost';
+TO 'macb_archivos'@'%';
 
 FLUSH PRIVILEGES;
 

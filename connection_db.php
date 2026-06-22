@@ -10,9 +10,9 @@
     // Base de datos en docker y servidor en docker
     //$host = "db"; 
 
-    $user = "macb_app";
-    $pass = "MacbApp2026!";
-    $db   = "macb_ape";
+    $user = "macb_archivos";
+    $pass = "MacbArchivos2026!";
+    $db   = "macb_archivos";
 
     $conn = new mysqli($host, $user, $pass, $db);
 
