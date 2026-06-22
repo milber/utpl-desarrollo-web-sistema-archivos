@@ -37,7 +37,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['accion']) && $_POST['
             $_SESSION['start_time'] = time();
 
             // Redirección a los mensajes
-            header("Location: messages.php");
+            header("Location: ../views/upload_file.php");
             exit();
         }
     }

@@ -1,5 +1,5 @@
 <?php
-class Archivo {
+class File {
     private $id;
     private $nombreOriginal;
     private $nombreArchivo;
