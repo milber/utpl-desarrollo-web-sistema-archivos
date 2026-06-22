@@ -3,7 +3,7 @@
 date_default_timezone_set('America/Guayaquil');
 // crear session
 session_start();
-require_once 'connection_db.php';
+require_once '../connection_db.php';
 
 // valicación de credenciales
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['accion']) && $_POST['accion'] === 'login') {

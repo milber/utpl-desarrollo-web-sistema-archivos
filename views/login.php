@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Acceso al Sistema</title>
-    <link rel="stylesheet" href="css/bootstrap.min.css">
+    <link rel="stylesheet" href="../css/bootstrap.min.css">
     <style>
         /* Estilo opcional para que el mensaje rojo se vea más vibrante */
         .invalid-feedback {
@@ -28,7 +28,7 @@
                         <h3 class="text-center mb-4 fw-bold">Bienvenido</h3>
 
                         <!-- Formulario de login  -->
-                        <form action="create_session.php" method="POST" class="needs-validation" novalidate>
+                        <form action="../session/create_session.php" method="POST" class="needs-validation" novalidate>
                             <input type="hidden" name="accion" value="login">
                             <div class="mb-3">
                                 <label class="form-label text-secondary small fw-bold">CORREO ELECTRÓNICO</label>
@@ -111,7 +111,7 @@
     </div>
 </div>
 
-<script src="js/bootstrap.min.js"></script>
+<script src="../js/bootstrap.min.js"></script>
 
 <script>
     // Stilos de validación de campos

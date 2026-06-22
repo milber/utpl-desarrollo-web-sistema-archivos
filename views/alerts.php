@@ -30,6 +30,11 @@
             case 'db_error':
                 $mensaje = "<strong>Error:</strong> Ocurrió un problema con la base de datos. Intenta de nuevo.";
                 break;
+            case 'upload_error':
+                session_start();
+                $mensaje = "<strong>Error de Carga:</strong> " . ($_SESSION['upload_err_msg'] ?? "No se pudo procesar el archivo.");
+                unset($_SESSION['upload_err_msg']);
+                break;
             default:
                 $mensaje = "Ocurrió un error inesperado.";
         }
@@ -48,7 +53,6 @@
         $mensaje_exito = "";
 
         switch ($_GET['status']) {
-            // ¡AQUÍ ES DONDE DEBE ESTAR!
             case 'message_success':
                 $mensaje_exito = "<strong>¡Enviado!</strong> Tu mensaje ha sido registrado con éxito. El autor se pondrá en contacto contigo.";
                 break;
@@ -60,6 +64,9 @@
                 break;
             case 'password_success':
                 $mensaje_exito = "<strong>¡Seguridad!</strong> Tu contraseña ha sido actualizada con éxito.";
+                break;
+            case 'upload_success':
+                $mensaje_exito = "<strong>¡Éxito!</strong> El archivo se ha subido y registrado correctamente en el sistema POO.";
                 break;
         }
 
