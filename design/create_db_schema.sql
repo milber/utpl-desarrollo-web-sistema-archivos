@@ -39,7 +39,7 @@ CREATE TABLE IF NOT EXISTS `macb_archivos`.`archivos` (
   `id` INT NOT NULL AUTO_INCREMENT,
   `nombre_original` VARCHAR(50) NOT NULL,
   `nombre_archivo` VARCHAR(100) NULL,
-  `tipo` VARCHAR(3) NOT NULL,
+  `tipo` VARCHAR(4) NOT NULL,
   `tamanio` INT NOT NULL,
   `carpeta` VARCHAR(45) NOT NULL,
   `fecha_subida` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
@@ -52,6 +52,10 @@ CREATE TABLE IF NOT EXISTS `macb_archivos`.`archivos` (
     ON DELETE NO ACTION
     ON UPDATE NO ACTION)
 ENGINE = InnoDB;
+
+ALTER TABLE `macb_archivos`.`archivos`
+ADD CONSTRAINT `chk_mimes_permitidos` 
+CHECK (`tipo` IN ('pdf', 'png', 'jpg', 'jpeg'));
 
 
 SET SQL_MODE=@OLD_SQL_MODE;

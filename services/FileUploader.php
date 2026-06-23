@@ -29,7 +29,7 @@ class FileUploader {
         // Verificamos si la carpeta existe en la raíz del servidor; si no, la creamos
         if (!file_exists($this->uploadDir)) {
             // El tercer parámetro 'true' permite la creación de directorios recursivos seguros
-            mkdir($this->uploadDir, 0755, true);
+            mkdir($this->uploadDir, 0750, true);
         }
     }
 
@@ -65,8 +65,8 @@ class FileUploader {
             return "El archivo excede el tamaño máximo permitido (10 MB).";
         }
 
-        // Forzar a que el tipo se guarde con un formato de máximo 3 caracteres (ej: jpe para jpeg)
-        $cleanExtension = substr($fileExtension, 0, 3);
+        // Forzar a que el tipo se guarde con un formato de máximo 4 caracteres (ej: jpe para jpeg)
+        $cleanExtension = substr($fileExtension, 0, 4);
         $file->setTipo($cleanExtension);
         
         // Generar un nombre hash único para evitar colisiones de archivos en el disco
