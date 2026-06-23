@@ -4,7 +4,7 @@
     session_unset();
     session_destroy();
 
-    // redirección a clase principal
-    header("Location: author.php");
+    // redirección a página principal
+    header("Location: ../views/login.php");
     exit();
 ?>

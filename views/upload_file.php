@@ -15,6 +15,14 @@ protect_page(); // Tu función de validación de sesión activa
 <body class="bg-light">
 
 <div class="container mt-5">
+    <div class="row justify-content-center mb-2">
+        <div class="col-md-6 col-lg-5 text-end">
+            <a href="../session/logout.php" class="btn btn-sm btn-outline-danger shadow-sm">
+                <i class="bi bi-box-arrow-left me-2"></i>Cerrar Sesión
+            </a>
+        </div>
+    </div>
+
     <div class="row justify-content-center">
         <div class="col-md-6 col-lg-5">
             
@@ -56,8 +64,8 @@ protect_page(); // Tu función de validación de sesión activa
                         <button type="submit" class="btn btn-primary btn-lg rounded-3 fs-6 fw-semibold shadow-sm">
                             <i class="bi bi-file-earmark-arrow-up me-2"></i> Iniciar Carga
                         </button>
-                        <a href="panel.php" class="btn btn-outline-secondary btn-sm rounded-3 mt-2 border-0 text-muted">
-                            <i class="bi bi-arrow-left me-1"></i> Volver al Inicio
+                        <a href="files_list.php" class="btn btn-outline-secondary btn-sm rounded-3 mt-2 border-0 text-muted">
+                            <i class="bi bi-arrow-left me-1"></i> Volver al Listado
                         </a>
                     </div>
                 </form>
@@ -101,7 +109,7 @@ protect_page(); // Tu función de validación de sesión activa
             const fileMime = file.type;
             const fileSize = file.size;
 
-            // 1. Validación estricta del tipo MIME en el Navegador
+            // Validación estricta del tipo MIME en el Navegador
             if (!allowedMimes.includes(fileMime)) {
                 fileInput.setCustomValidity('invalid_mime');
                 feedback.innerHTML = "<strong>Error:</strong> El contenido real del archivo no es un formato válido (Solo PDF, JPG, PNG).";
@@ -109,7 +117,7 @@ protect_page(); // Tu función de validación de sesión activa
                 event.stopPropagation();
             }
             
-            // 2. Validación complementaria de peso (Máx 10MB)
+            // Validación complementaria de peso (Máx 10MB)
             if (fileSize > maxSizeBytes) {
                 fileInput.setCustomValidity('invalid_size');
                 feedback.innerHTML = "<strong>Error:</strong> El archivo excede el límite máximo permitido de 10 MB.";

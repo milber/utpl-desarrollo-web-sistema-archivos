@@ -1,4 +1,6 @@
 <?php
+require_once '../session/create_session.php';
+protect_page(); // Tu función de validación de sesión activa
 require_once __DIR__ . '/../services/get_files.php';
 ?>
 <!DOCTYPE html>
@@ -22,9 +24,14 @@ require_once __DIR__ . '/../services/get_files.php';
                 <h1 class="h2 font-weight-bold mb-1 text-white">Repositorio de Archivos</h1>
                 <p class="text-muted small mb-0">Listado de tareas y documentos del sistema académico.</p>
             </div>
-            <a href="upload_file.php" class="btn btn-primary shadow-sm">
-                <i class="bi bi-plus-circle-fill me-2"></i>Subir Nuevo Archivo
-            </a>
+            <div class="d-flex gap-2">
+                <a href="../session/logout.php" class="btn btn-outline-danger shadow-sm">
+                    <i class="bi bi-box-arrow-left me-2"></i>Cerrar Sesión
+                </a>
+                <a href="upload_file.php" class="btn btn-primary shadow-sm">
+                    <i class="bi bi-plus-circle-fill me-2"></i>Subir Nuevo Archivo
+                </a>
+            </div>
         </div>
 
         <div class="card border-secondary shadow-lg overflow-hidden">
