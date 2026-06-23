@@ -36,8 +36,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['accion']) && $_POST['
             $_SESSION['user_fecha_registro'] = $user['fecha_registro'];
             $_SESSION['start_time'] = time();
 
-            // Redirección a los mensajes
-            header("Location: ../views/upload_file.php");
+            // Redirección a la lista de archivos
+            header("Location: ../views/files_list.php");
             exit();
         }
     }

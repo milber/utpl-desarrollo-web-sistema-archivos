@@ -79,7 +79,6 @@ class FileUploader {
 
         // Mover el archivo físico desde el directorio temporal al destino definitivo
         if (move_uploaded_file($tmpName, $targetPath)) {
-            lJ
             return $file->save($this->db, $targetPath); 
         }
 

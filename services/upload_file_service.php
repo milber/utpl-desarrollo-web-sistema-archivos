@@ -30,7 +30,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_FILES['documento'])) {
     $resultado = $uploader->upload($_FILES['documento'], $archivoModelo);
 
     if ($resultado === true) {
-        header("Location: ../views/upload_file.php?status=upload_success");
+        header("Location: ../views/files_list.php?status=upload_success");
         exit();
     } else {
         $_SESSION['upload_err_msg'] = $resultado;
