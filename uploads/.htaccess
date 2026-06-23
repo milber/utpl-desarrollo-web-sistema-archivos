@@ -1,0 +1,21 @@
+# 1. Desactivar la ejecución de scripts PHP en esta carpeta
+<IfModule mod_php.c>
+    php_flag engine off
+</IfModule>
+<IfModule mod_php7.c>
+    php_flag engine off
+</IfModule>
+<IfModule mod_php8.c>
+    php_flag engine off
+</IfModule>
+
+# 2. Bloquear la ejecución de cualquier otro script ejecutable o CGI
+Options -ExecCGI -Indexes
+RemoveHandler .php .phtml .php3 .php4 .php5 .php7 .php8 .pl .py .jsp .asp .sh .shtml
+ForceType application/octet-stream
+
+# 3. Permitir ver en línea solo formatos autorizados (PDF e Imágenes)
+<FilesMatch "(?i)\.(pdf|png|jpe?g)$">
+    ForceType text/html
+    Header set Content-Disposition inline
+</FilesMatch>

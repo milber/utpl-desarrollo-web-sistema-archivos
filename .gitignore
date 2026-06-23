@@ -1,3 +1,8 @@
 
 .talismanrc
 
+# Ignorar absolutamente todo dentro de la carpeta de subidas
+uploads/*
+
+# EXCEPCIÓN: No ignorar el archivo de seguridad .htaccess
+!uploads/.htaccess
