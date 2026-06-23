@@ -8,10 +8,13 @@ services:
       - "8080:80"
     volumes:
       - ../:/var/www/html
+      # Inyectamos regla de no ejecucions
+      - ./custom-apache.conf:/etc/apache2/sites-enabled/000-default.conf
     # Esta es la instrucción para instalar al arrancar
     command: >
       sh -c "docker-php-ext-install mysqli &&
              docker-php-ext-enable mysqli &&
+             a2enmod headers &&
              apache2-foreground"
     restart: always
 
