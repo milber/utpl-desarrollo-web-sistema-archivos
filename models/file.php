@@ -52,5 +52,70 @@ class File {
         }
         return $this->tamanio . ' bytes';
     }
+
+    /**
+     * Guarda los metadatos del archivo en la base de datos.
+     */
+    public function save(\mysqli $db, string $targetPath): true|string 
+    {
+        // Persistencia: Preparación de la consulta SQL con sentencias preparadas para mitigar SQL Injection
+        $sql = "INSERT INTO archivos (nombre_original, nombre_archivo, tipo, tamanio, carpeta, usuarios_id_usuario) 
+                VALUES (?, ?, ?, ?, ?, ?)";
+        
+        $stmt = $db->prepare($sql);
+        if (!$stmt) {
+            return "Error crítico al preparar la consulta estructural SQL.";
+        }
+
+        // Recuperamos los datos encapsulados dentro de las propiedades de este mismo objeto
+        $nombreOriginal = $this->getNombreOriginal();
+        $nombreArchivo  = $this->getNombreArchivo();
+        $tipo           = $this->getTipo();
+        $tamanio        = $this->getTamanio();
+        $carpeta        = $this->getCarpeta();
+        $usuarioId      = $this->getUsuariosIdUsuario();
+
+        $stmt->bind_param(
+            "sssisi", 
+            $nombreOriginal, 
+            $nombreArchivo, 
+            $tipo, 
+            $tamanio, 
+            $carpeta, 
+            $usuarioId
+        );
+        
+        try {
+            if ($stmt->execute()) {
+                $stmt->close();
+                return true; // Éxito total
+            } else {
+                if (file_exists($targetPath)) {
+                    unlink($targetPath);
+                }
+                return "Error al registrar los metadatos en la base de datos.";
+            }
+        } 
+        catch (\mysqli_sql_exception $e) {
+            // Si ocurre un fallo en la base de datos, borramos el archivo físico para no dejar basura
+            if (file_exists($targetPath)) {
+                unlink($targetPath);
+            }
+            $stmt->close();
+
+            // Detectar si el error específico es por la longitud del texto o violación del CHECK Constraint
+            if ($e->getCode() === 1406 || strpos($e->getMessage(), 'Data too long') !== false) {
+                return "El nombre original del archivo es demasiado largo (Máximo 50 caracteres).";
+            }
+            
+            // Capturar si el error es debido al CHECK constraint de MIMES q
+            if ($e->getCode() === 3819 || strpos($e->getMessage(), 'chk_mimes_permitidos') !== false) {
+                return "El tipo de archivo no está permitido por la base de datos.";
+            }
+
+            // Cualquier otro error de SQL imprevisto
+            return "Error de base de datos al procesar la carga: " . $e->getMessage();
+        }
+    }
 }
 ?>

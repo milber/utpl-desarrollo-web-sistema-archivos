@@ -23,7 +23,7 @@ class FileUploader {
         // Limpiamos barras iniciales o finales que se pasen por parámetro
         $cleanPath = trim($uploadDirectory, '/\\');
 
-        // agregando el archivo a: /var/www/html/uploads/
+        // Agregando el archivo a: /var/www/html/uploads/
         $this->uploadDir = $_SERVER['DOCUMENT_ROOT'] . '/' . $cleanPath . '/';
         
         // Verificamos si la carpeta existe en la raíz del servidor; si no, la creamos
@@ -34,7 +34,7 @@ class FileUploader {
     }
 
     /**
-     * Procesa la validación, almacenamiento en disco e inserción en la base de datos
+     * Procesa la validación, almacenamiento en disco y delega la persistencia al modelo
      */
     public function upload($fileArray, File $file) {
         // Validar errores de carga nativos de la directiva de PHP
@@ -77,59 +77,10 @@ class FileUploader {
         // Ruta final donde se alojará el archivo dentro del volumen de Docker
         $targetPath = $this->uploadDir . $uniqueName;
 
-        // 4. Mover el archivo físico desde el directorio temporal al destino definitivo
+        // Mover el archivo físico desde el directorio temporal al destino definitivo
         if (move_uploaded_file($tmpName, $targetPath)) {
-            
-            // 5. Persistencia: Preparación de la consulta SQL con sentencias preparadas para mitigar SQL Injection
-            $sql = "INSERT INTO archivos (nombre_original, nombre_archivo, tipo, tamanio, carpeta, usuarios_id_usuario) 
-                    VALUES (?, ?, ?, ?, ?, ?)";
-            
-            $stmt = $this->db->prepare($sql);
-            if ($stmt) {
-                // Recuperamos los datos encapsulados dentro del objeto Modelo
-                $nombreOriginal = $file->getNombreOriginal();
-                $nombreArchivo  = $file->getNombreArchivo();
-                $tipo           = $file->getTipo();
-                $tamanio        = $file->getTamanio();
-                $carpeta        = $file->getCarpeta();
-                $usuarioId      = $file->getUsuariosIdUsuario();
-
-                // Enlazamos las variables a los comodines de la consulta (s = string, i = entero)
-                $stmt->bind_param(
-                    "sssisi", 
-                    $nombreOriginal, 
-                    $nombreArchivo, 
-                    $tipo, 
-                    $tamanio, 
-                    $carpeta, 
-                    $usuarioId
-                );
-                
-                try {
-                    if ($stmt->execute()) {
-                        $stmt->close();
-                        return true; // Éxito total
-                    } else {
-                        unlink($targetPath);
-                        return "Error al registrar los metadatos en la base de datos.";
-                    }
-                } 
-                catch (mysqli_sql_exception $e) {
-                    // Si ocurre un fallo en la base de datos, borramos el archivo físico para no dejar basura
-                    unlink($targetPath);
-                    $stmt->close();
-
-                    // Detectar si el error específico es por la longitud del texto (Código de error MySQL: 1406)
-                    if ($e->getCode() === 1406 || strpos($e->getMessage(), 'Data too long') !== false) {
-                        return "El nombre original del archivo es demasiado largo (Máximo 50 caracteres).";
-                    }
-
-                    // Cualquier otro error de SQL imprevisto
-                    return "Error de base de datos al procesar la carga: " . $e->getMessage();
-                }
-                // --- FIN DEL TRY-CATCH ---
-            }
-            return "Error crítico al preparar la consulta estructural SQL.";
+            lJ
+            return $file->save($this->db, $targetPath); 
         }
 
         return "El servidor no cuenta con permisos de escritura para mover el archivo al directorio destino.";
