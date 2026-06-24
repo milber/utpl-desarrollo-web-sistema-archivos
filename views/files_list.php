@@ -90,10 +90,9 @@ require_once __DIR__ . '/../services/get_files.php';
                                         <?= date('d/m/Y H:i', strtotime($arc['fecha_subida'] ?? 'now')) ?>
                                     </td>
                                     <td class="px-4 py-3 text-end">
-                                        <a href="/uploads/<?= urlencode($arc['nombre_archivo']) ?>" 
-                                           target="_blank" 
+                                        <a href="../services/download.php?file=<?= urlencode($arc['nombre_archivo']) ?>"
                                            class="btn btn-sm btn-outline-info">
-                                            <i class="bi bi-box-arrow-up-right me-1"></i>Ver
+                                            <i class="bi bi-cloud-arrow-down me-1"></i>Descargar
                                         </a>
                                     </td>
                                 </tr>
