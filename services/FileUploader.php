@@ -43,7 +43,9 @@ class FileUploader {
         }
 
         // Asignamos el nombre original y tamaño al modelo para su evaluación
-        $file->setNombreOriginal($fileArray['name']);
+        $usuarioId = $_SESSION['id_usuario'] ?? 1;
+        $nombreProcesado = $this->verficarNombreDuplicado($fileArray['name'], $usuarioId);
+        $file->setNombreOriginal($nombreProcesado);
         $file->setTamanio($fileArray['size']);
         $tmpName = $fileArray['tmp_name'];
         
@@ -83,6 +85,45 @@ class FileUploader {
         }
 
         return "El servidor no cuenta con permisos de escritura para mover el archivo al directorio destino.";
+    }
+
+    /**
+     * Comprueba si el nombre original ya existe para el usuario en la BD
+     * Si existe, le añade un guión y la palabra copia respetando la extensión.
+     */
+    private function verficarNombreDuplicado($nombreOriginal, $usuarioId) {
+        $nombreFinal = $nombreOriginal;
+        
+        // Separamos el nombre de la extensión 
+        $pathInfo = pathinfo($nombreOriginal);
+        $filename = $pathInfo['filename'];
+        $extension = isset($pathInfo['extension']) ? '.' . $pathInfo['extension'] : '';
+
+        // Bucle iterativo: mientras el nombre exista en la BD, seguirá agregando " - copia"
+        while (true) {
+            $sql = "SELECT COUNT(*) AS total FROM archivos WHERE nombre_original = ? AND usuarios_id_usuario = ?";
+            $stmt = $this->db->prepare($sql);
+            
+            if (!$stmt) {
+                break; // Si falla la preparación, rompemos para evitar bucle infinito
+            }
+
+            $stmt->bind_param("si", $nombreFinal, $usuarioId);
+            $stmt->execute();
+            $result = $stmt->get_result()->fetch_assoc();
+            $stmt->close();
+
+            if ($result['total'] == 0) {
+                // El nombre está libre, salimos del bucle
+                break;
+            }
+
+            // Si ya existe, modificamos el cuerpo del nombre y repetimos la validación
+            $filename .= "-copia";
+            $nombreFinal = $filename . $extension;
+        }
+
+        return $nombreFinal;
     }
 }
 ?>
