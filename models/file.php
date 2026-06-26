@@ -117,5 +117,49 @@ class File {
             return "Error de base de datos al procesar la carga: " . $e->getMessage();
         }
     }
+
+    /**
+     * Elimina el archivo físico del disco y su registro en la base de datos
+     */
+    public function delete($db, $idArchivo, $idUsuario) {
+        // Obtener la información del archivo antes de borrar el registro
+        $sql = "SELECT nombre_archivo, carpeta FROM archivos WHERE id = ? AND usuarios_id_usuario = ?";
+        $stmt = $db->prepare($sql);
+        if (!$stmt) {
+            return "Error al preparar la consulta de verificación.";
+        }
+
+        $stmt->bind_param("ii", $idArchivo, $idUsuario);
+        $stmt->execute();
+        $resultado = $stmt->get_result()->fetch_assoc();
+        $stmt->close();
+
+        if (!$resultado) {
+            return "El archivo no existe o no tienes permisos para eliminarlo.";
+        }
+
+        $rutaFisica = $resultado['carpeta'] . $resultado['nombre_archivo'];
+
+        // Eliminar el registro de la Base de Datos
+        $sqlDelete = "SELECT id FROM archivos WHERE id = ?";
+        $sqlDelete = "DELETE FROM archivos WHERE id = ? AND usuarios_id_usuario = ?";
+        $stmtDel = $db->prepare($sqlDelete);
+        if (!$stmtDel) {
+            return "Error al preparar la eliminación.";
+        }
+        $stmtDel->bind_param("ii", $idArchivo, $idUsuario);
+        $executeDel = $stmtDel->execute();
+        $stmtDel->close();
+
+        if ($executeDel) {
+            // Si se borró de la BD con éxito, eliminamos el archivo físico del disco
+            if (file_exists($rutaFisica)) {
+                unlink($rutaFisica);
+            }
+            return true;
+        }
+
+        return "No se pudo eliminar el registro de la base de datos.";
+    }
 }
 ?>

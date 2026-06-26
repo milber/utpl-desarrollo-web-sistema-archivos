@@ -9,7 +9,7 @@ require_once __DIR__ . '/../services/get_files.php';
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Sistema MACB - Archivos Subidos</title>
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+    <link class="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
     <link rel="stylesheet" href="../css/bootstrap.min.css">
     <link rel="stylesheet" href="../css/styles.css">
 </head>
@@ -58,7 +58,7 @@ require_once __DIR__ . '/../services/get_files.php';
                                     <td class="px-4 py-3 font-weight-bold text-white">
                                         <div class="d-flex align-items-center">
                                             <?php 
-                                                $ext = strtolower($arc['tipo']);
+                                                $ext = strtolower($arc['tipo'] ?? 'desconocido');
                                                 if ($ext === 'pdf'): 
                                             ?>
                                                 <i class="bi bi-file-earmark-pdf-fill text-danger h4 mb-0 me-3"></i>
@@ -66,19 +66,19 @@ require_once __DIR__ . '/../services/get_files.php';
                                                 <i class="bi bi-file-earmark-image-fill text-success h4 mb-0 me-3"></i>
                                             <?php endif; ?>
                                             
-                                            <span class="d-inline-block text-truncate text-dark font-weight-bold" style="max-width: 350px;" title="<?= htmlspecialchars($arc['nombre_original']) ?>">
-                                                <?= htmlspecialchars($arc['nombre_original']) ?>
+                                            <span class="d-inline-block text-truncate text-dark font-weight-bold" style="max-width: 350px;" title="<?= htmlspecialchars($arc['nombre_original'] ?? 'Sin nombre') ?>">
+                                                <?= htmlspecialchars($arc['nombre_original'] ?? 'Sin nombre') ?>
                                             </span>
                                         </div>
                                     </td>
                                     <td class="px-4 py-3">
                                         <span class="badge bg-secondary text-uppercase px-2 py-1.5">
-                                            <?= htmlspecialchars($arc['tipo']) ?>
+                                            <?= htmlspecialchars($arc['tipo'] ?? 'N/A') ?>
                                         </span>
                                     </td>
                                     <td class="px-4 py-3 text-body font-weight-normal">
                                         <?php 
-                                            $bytes = $arc['tamanio'];
+                                            $bytes = $arc['tamanio'] ?? 0;
                                             if ($bytes >= 1048576) {
                                                 echo number_format($bytes / 1048576, 2) . ' MB';
                                             } else {
@@ -90,10 +90,20 @@ require_once __DIR__ . '/../services/get_files.php';
                                         <?= date('d/m/Y H:i', strtotime($arc['fecha_subida'] ?? 'now')) ?>
                                     </td>
                                     <td class="px-4 py-3 text-end">
-                                        <a href="../services/download.php?file=<?= urlencode($arc['nombre_archivo']) ?>"
-                                           class="btn btn-sm btn-outline-info">
-                                            <i class="bi bi-cloud-arrow-down me-1"></i>Descargar
-                                        </a>
+                                        <div class="d-inline-flex gap-1">
+                                            <a href="../services/download.php?file=<?= urlencode($arc['nombre_archivo'] ?? '') ?>" 
+                                               class="btn btn-sm btn-outline-info">
+                                                <i class="bi bi-cloud-arrow-down me-1"></i>Descargar
+                                            </a>
+                                            <button type="button" 
+                                                    class="btn btn-sm btn-outline-danger btn-delete-trigger"
+                                                    data-bs-toggle="modal" 
+                                                    data-bs-target="#deleteModal"
+                                                    data-id="<?= $arc['id'] ?? 0 ?>"
+                                                    data-nombre="<?= htmlspecialchars($arc['nombre_original'] ?? 'Archivo') ?>">
+                                                <i class="bi bi-trash3-fill"></i> Eliminar
+                                            </button>
+                                        </div>
                                     </td>
                                 </tr>
                             <?php endforeach; ?>
@@ -102,8 +112,75 @@ require_once __DIR__ . '/../services/get_files.php';
                 </div>
             <?php endif; ?>
         </div>
-        
     </div>
-    <script src="../js/bootstrap.min.js"></script>
+
+    <div class="modal fade" id="deleteModal" isset-modal-focus tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content border-danger shadow-lg">
+                <div class="modal-header bg-danger text-white">
+                    <h5 class="modal-title fw-bold" id="deleteModalLabel"><i class="bi bi-exclamation-triangle-fill me-2"></i>¿Eliminar archivo definitivamente?</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <form action="../services/delete_file.php" method="POST" id="formDeleteSecure">
+                    <div class="modal-body text-dark">
+                        <p>Esta acción destruirá el archivo del servidor y no podrá recuperarse.</p>
+                        <p class="mb-3">Para confirmar, escribe el nombre exacto del archivo: <br><strong id="txtNombreArchivoMatch" class="text-danger"></strong></p>
+
+                        <input type="hidden" name="id_archivo" id="modalIdArchivo">
+                        <input type="hidden" name="nombre_original" id="modalNombreOriginal">
+
+                        <input type="text"
+                               class="form-control rounded-3"
+                               id="inputNombreConfirmacion" 
+                               name="nombre_confirmacion"
+                               placeholder="Escribe el nombre aquí..."
+                               autocomplete="off"
+                               required>
+                    </div>
+                    <div class="modal-footer bg-light">
+                        <button type="button" class="btn btn-sm btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                        <button type="submit" class="btn btn-sm btn-danger fw-bold" id="btnConfirmarBorrado" disabled>
+                            <i class="bi bi-trash3-fill me-1"></i>Eliminar Registro
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const deleteButtons = document.querySelectorAll('.btn-delete-trigger');
+            const modalIdInput = document.getElementById('modalIdArchivo');
+            const modalNombreInput = document.getElementById('modalNombreOriginal');
+            const txtLabelMatch = document.getElementById('txtNombreArchivoMatch');
+            const inputConfirm = document.getElementById('inputNombreConfirmacion');
+            const btnSubmit = document.getElementById('btnConfirmarBorrado');
+
+            deleteButtons.forEach(btn => {
+                btn.addEventListener('click', () => {
+                    const id = btn.getAttribute('data-id');
+                    const nombre = btn.getAttribute('data-nombre');
+
+                    modalIdInput.value = id;
+                    modalNombreInput.value = nombre;
+                    txtLabelMatch.textContent = nombre;
+
+                    inputConfirm.value = "";
+                    btnSubmit.disabled = true;
+                });
+            });
+
+            inputConfirm.addEventListener('input', () => {
+                if (inputConfirm.value.trim() === modalNombreInput.value.trim()) {
+                    btnSubmit.disabled = false;
+                } else {
+                    btnSubmit.disabled = true;
+                }
+            });
+        });
+    </script>
 </body>
 </html>

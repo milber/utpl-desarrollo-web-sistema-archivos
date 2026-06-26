@@ -10,7 +10,7 @@ $usuarioId = $_SESSION['id_usuario'] ?? 1;
 $archivos = [];
 $link = $conn;
 if (!$conn) {
-    die("Error de Infraestructura: No se encontró una variable de conexión MySQLi válida (\$conexion, \$conn o \$db) en connection_db.php.");
+    die("Error de conexión a la base de datos.");
 }
 
 $sql = "SELECT id, nombre_original, nombre_archivo, tipo, tamanio, fecha_subida

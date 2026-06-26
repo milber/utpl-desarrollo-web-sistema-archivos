@@ -1,7 +1,10 @@
 <?php
     // Archivo que maneja las alertas de la aplicación
+    if (session_status() === PHP_SESSION_NONE) {
+        session_start();
+    }
 
-    // --- MANEJO DE ERRORES ---
+    // --- MANEJO DE ERRORES POR URL ($_GET) ---
     if (isset($_GET['error'])) {
         $mensaje = "";
         $tipo = "danger"; // Color rojo de Bootstrap
@@ -47,7 +50,7 @@
         }
     }
 
-    // --- MANEJO DE ÉXITOS ---
+    // --- MANEJO DE ÉXITOS POR URL ($_GET) ---
     if (isset($_GET['status'])) {
         $mensaje_exito = "";
 
@@ -76,5 +79,27 @@
                 <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
             </div>';
         }
+    }
+
+    // --- NUEVO: MANEJO DE SESIONES DINÁMICAS (Para Borrado Seguro y Cargas Complejas) ---
+    if (isset($_SESSION['error_upload']) && !empty($_SESSION['error_upload'])) {
+        $msgSession = $_SESSION['error_upload'];
+        
+        // Evaluamos si el string guardado contiene palabras de confirmación positiva
+        $esEstadoOk = (strpos(strtolower($msgSession), 'éxito') !== false || strpos(strtolower($msgSession), 'correctamente') !== false);
+        $alertStyle = $esEstadoOk ? 'success' : 'danger';
+        $iconStyle = $esEstadoOk ? 'bi-check-circle-fill' : 'bi-exclamation-triangle-fill';
+
+        echo '
+        <div class="alert alert-' . $alertStyle . ' alert-dismissible fade show shadow-sm d-flex align-items-center" role="alert">
+            <i class="bi ' . $iconStyle . ' me-2 h5 mb-0"></i>
+            <div>
+                ' . $msgSession . '
+            </div>
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>';
+
+        // Destruimos la variable para que no se duplique al recargar con F5
+        unset($_SESSION['error_upload']);
     }
 ?>
