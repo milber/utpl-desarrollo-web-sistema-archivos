@@ -1,72 +1,47 @@
-# Sistema de Formulario de Contacto- Proyecto Académico UTPL
+# Sistema de Gestión de Archivos Académicos (Sistema MACB)
 
-Este es un proyecto académico desarrollado para la materia de **Desarrollo Web** en la carrera de **Tecnologías de la Información**. La aplicación consiste en un sistema que muestre una página informativa, y presente un formulario de contacto. Además se ha agregado que un usuario admin pueed listar los mensajes de contacto recibidos.
+Este es un módulo seguro de almacenamiento, descarga y eliminación de tareas y documentos, desarrollado bajo el paradigma de **Programación Orientada a Objetos (POO)** en PHP nativo, persistencia de datos relacional y despliegue contenedorizado.
 
-## 🛠️ Stack Tecnológico
-* **Lenguaje:** PHP 8.x
-* **Base de Datos:** MySQL 8.0
-* **Frontend:** HTML5, CSS3, JavaScript (ES6+)
-* **Framework CSS:** Bootstrap 5.3 (Estilos modernos y responsivos)
-* **Iconografía:** Bootstrap Icons
+---
 
-## 📋 Requerimientos Técnicos
-1.  **Servidor Web:** Apache (recomendado a través de XAMPP, WAMP o Laragon).
-2.  **PHP:** Versión 7.4 o superior (Compatible con PHP 8).
-3.  **Gestor de BD:** MySQL / MariaDB.
-4.  **Extensión MySQLi:** Habilitada en PHP para la conexión a la base de datos.
+## 🚀 Características Principales
 
-## 🚀 Configuración e Instalación
+* **Arquitectura MVC/POO:** Separación limpia de responsabilidades utilizando un Modelo de datos (`File`), Controladores de servicios independientes y Vistas dinámicas basadas en Bootstrap 5.
+* **Mecanismo de Borrado Seguro:** El sistema implementa una confirmación de doble factor en la interfaz de usuario. Para eliminar un archivo, el usuario debe ingresar manualmente su nombre exacto, validándose tanto en el Frontend (JavaScript) como en el Backend (PHP).
+* **Seguridad Perimetral (Hardening de Servidor):** Blindaje absoluto de la carpeta de almacenamiento contra ataques de ejecución remota de código (RCE).
+* **Trazabilidad mediante Logs:** Instrumentación de logs estructurados (`error_log`) para auditar en tiempo real los payloads de las peticiones dentro del contenedor.
 
-### 1. Clona el proyecto
-https://github.com/milber/utpl-desarrollo_web-apeb1
+---
 
+## 📂 Arquitectura del Módulo
 
-### 2. Preparación de la Base de Datos
-Debes ejecutar el script de SQL proporcionado en https://github.com/milber/utpl-desarrollo_web-apeb1/blob/master/design/create_db_schema.sql para configurar el entorno. El script realiza lo siguiente:
+El flujo del borrado seguro y control de archivos está distribuido de la siguiente manera:
 
-* Crea el esquema `macb_ape`.
-* Crea la tabla `usuarios` con restricciones de unicidad para Cédula y Correo.
-* Crea un usuario de base de datos específico (`macb_app`) con permisos restringidos por seguridad.
-* Crea la tabla `formulario contacto`.
-* Inserta un usuario **Administrador** por defecto.
+```text
+├── models/
+│   └── file.php              # Modelo de Objeto: Abstracción de datos y métodos CRUD (save/delete)
+├── services/
+│   ├── get_files.php         # Controlador: Consulta y listado del repositorio
+│   ├── download.php          # Controlador: Descarga forzada controlada por cabeceras HTTP
+│   └── delete_file.php       # Controlador: Validación de payload y orquestación de borrado
+├── views/
+│   ├── files_list.php        # Vista: Tabla de archivos y Modal dinámico de confirmación
+│   └── alerts.php            # Componente: Manejo unificado de alertas por URL ($_GET) y de Sesión ($_SESSION)
+└── config/ (o raíz)
+    └── 000-default.conf      # Configuración de Apache: Reglas estrictas de seguridad para /uploads
 
-**Pasos:**
-1. Abre MySQL Workbench ,phpMyAdmin o cualquier cliente de base de datos que permita acceso a MySQL.
-2. Coneectate con un usuario con los privilegios para crear un schema
-3. Copia y pega el contenido del archivo de creación de base de datos.
-4. Ejecuta el script completo.
+```
 
-**Credenciales de Administrador por defecto:**
-* **Usuario:** `admin@admin.com`
-* **Contraseña:** `Pa55word`
+## 🔒 Directivas de Seguridad Implementadas
+La carpeta /var/www/html/uploads se encuentra fortificada en la configuración de Apache (000-default.conf) mediante las siguientes capas defensivas:
 
-### 3. Funcionamiento en ambiente de desarrollo
-1. Asegúrate de que el archivo de conexión (`connection_db.php`) tenga las credenciales del usuario `macb_app` creadas en el script SQL.
-2. Inicia los módulos de Apache y MySQL, puedes usar el tu panel de control (XAMPP).
-3. Abre tu navegador y accede a `http://localhost:8080/`. Nota, el puerto puede cambiar de acuerdo a tu configuració local.
+Denegación por Defecto (Require all denied): Ningún usuario puede acceder o listar los archivos escribiendo la URL directa en el navegador. Las descargas se gestionan de forma controlada a través de PHP.
 
-## 📂 Estructura del Proyecto
-* `index.php`: Carátula académica y redirección inicial.
-* `login.php`: Formularios de acceso para el usuario admin.
-* `create_session.php`: Crea la sessión.
-* `author.php`: Visualización de información pública del autro.
-* `contact.php`: Interfaces de formulario de contacto.
-* `insert_contact.php`: Lógica de procesamiento el formulario de contacto.
-* `alerts.php`: Componente centralizado de mensajes y notificaciones.
+Neutralización de Ejecución (php_flag engine off): El motor de PHP está completamente apagado dentro de la carpeta. Si se aloja un script malicioso, Apache lo procesará como texto plano inofensivo.
 
+Remoción de Handlers: Se eliminaron los manejadores de ejecución para extensiones críticas (.php, .phtml, .pl, .py, .sh, etc.).
 
-# Sistema de Formulario de Contacto - Proyecto Académico UTPL
-
-URL de inicio:  https://milber.free.nf/index.html
-
-Para ingresar como adminstrador:  https://milber.free.nf/login.php
-
-
-* `correo`      : admin@admin.com
-* `contraseña` : Pa55word
-
-Nota: Se agregó una página para que el administrador revise los mensajes recibidos
-
+Aislamiento de Overrides (AllowOverride None): Se ignora el procesamiento de archivos .htaccess en este directorio para evitar que configuraciones inyectadas reescriban las reglas del servidor raíz.
 
 ---
 **Autor:** Milber Champutiz Burbano  
