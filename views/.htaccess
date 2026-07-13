@@ -3,3 +3,15 @@
     RewriteCond %{HTTPS} off
     RewriteRule ^(.*)$ https://%{HTTP_HOST}%{REQUEST_URI} [L,R=301]
 </IfModule>
+
+
+AuthType Basic
+AuthName "Acceso Restringido"
+AuthUserFile /Applications/XAMPP/xamppfiles/htdocs/utpl-desarrollo-web-sistema-archivos/views/.htpasswd
+Require user milber
+
+# Bloquear acceso al archivo de contraseñas
+<Files .htpasswd>
+    Order Deny,Allow
+    Deny from all
+</Files>
