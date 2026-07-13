@@ -1,4 +1,5 @@
 <?php
+ob_start();
 require_once '../session/create_session.php';
 protect_page(); // Tu función de validación de sesión activa
 require_once __DIR__ . '/../services/get_files.php';

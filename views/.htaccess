@@ -1,0 +1,5 @@
+RewriteEngine On
+
+# Si la conexión NO es HTTPS, redirige manteniendo el host y la URI actual
+RewriteCond %{HTTPS} off
+RewriteRule ^(.*)$ https://%{HTTP_HOST}/views/$1 [R=301,L]
